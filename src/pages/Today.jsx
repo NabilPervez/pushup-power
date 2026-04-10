@@ -7,7 +7,9 @@ export default function Today() {
   const [showWaterModal, setShowWaterModal] = useState(false);
   const [customWater, setCustomWater] = useState('');
   const [toastMessage, setToastMessage] = useState('');
-  
+  const [pushups, setPushups] = useState(0);
+  const [squats, setSquats] = useState(0);
+
   const settings = useLiveQuery(() => db.user_settings.get('user'));
   const baselines = useLiveQuery(() => db.baselines.orderBy('timestamp').last());
   const todayDateString = currentDate.toISOString().split('T')[0];
@@ -36,8 +38,7 @@ export default function Today() {
   const pushupsTarget = Math.floor((baselines.pushups_max * 0.30) * multiplier);
   const squatsTarget = Math.floor((baselines.squats_max * 0.30) * multiplier);
 
-  const [pushups, setPushups] = useState(pushupsTarget);
-  const [squats, setSquats] = useState(squatsTarget);
+
 
   // Reset inputs when target changes
   useEffect(() => {
