@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Analytics() {
   const logs = useLiveQuery(() => db.workout_logs.toArray());
@@ -13,15 +14,36 @@ export default function Analytics() {
   const todayLogs = logs.filter(l => l.date === todayDateString);
   const todayPushups = todayLogs.reduce((acc, log) => acc + (log.pushups_completed || 0), 0);
   const todaySquats = todayLogs.reduce((acc, log) => acc + (log.squats_completed || 0), 0);
-  const todaySteps = todayLogs.reduce((acc, log) => Math.max(acc, log.steps_logged || 0), 0);
+  const todaySteps = todayLogs.reduce((acc, log) => acc + (log.steps_logged || 0), 0);
   const todayWater = todayLogs.reduce((acc, log) => acc + (log.water_oz || 0), 0);
 
 
+  const dailyAggregates = {};
+  logs.forEach(log => {
+    if (!dailyAggregates[log.date]) {
+      dailyAggregates[log.date] = { pushups: 0, squats: 0, steps: 0, water: 0, date: log.date };
+    }
+    dailyAggregates[log.date].pushups += (log.pushups_completed || 0);
+    dailyAggregates[log.date].squats += (log.squats_completed || 0);
+    dailyAggregates[log.date].steps += (log.steps_logged || 0);
+    dailyAggregates[log.date].water += (log.water_oz || 0);
+  });
+
+  const dailyAggregatesList = Object.values(dailyAggregates).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const totalDays = dailyAggregatesList.length || 1;
+  const avgPushups = Math.round(dailyAggregatesList.reduce((acc, val) => acc + val.pushups, 0) / totalDays);
+  const avgSquats = Math.round(dailyAggregatesList.reduce((acc, val) => acc + val.squats, 0) / totalDays);
+  const avgSteps = Math.round(dailyAggregatesList.reduce((acc, val) => acc + val.steps, 0) / totalDays);
+
+  const maxPushups = dailyAggregatesList.reduce((max, val) => Math.max(max, val.pushups), 0);
+  const maxSquats = dailyAggregatesList.reduce((max, val) => Math.max(max, val.squats), 0);
+  const maxSteps = dailyAggregatesList.reduce((max, val) => Math.max(max, val.steps), 0);
+
   const getHeatmapData = () => {
     const data = {};
-    logs.forEach(log => {
-      const total = (log.pushups_completed || 0) + (log.squats_completed || 0);
-      data[log.date] = (data[log.date] || 0) + total;
+    dailyAggregatesList.forEach(log => {
+      data[log.date] = log.pushups + log.squats;
     });
     return data;
   };
@@ -53,26 +75,34 @@ export default function Analytics() {
     );
   }
 
-  const generateChartPoints = (logs, type) => {
-      const byDate = {};
-      logs.forEach(l => {
-          byDate[l.date] = (byDate[l.date] || 0) + (l[type] || 0);
-      });
-      const days = [];
-      for(let i=6; i>=0; i--) {
-          const d = new Date(); d.setDate(d.getDate() - i);
-          days.push(d.toISOString().split('T')[0]);
+  const generateChartData = () => {
+    const byDate = {};
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      days.push(dateStr);
+      byDate[dateStr] = {
+        name: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        pushups: 0,
+        squats: 0,
+        steps: 0
+      };
+    }
+
+    logs.forEach(l => {
+      if (byDate[l.date]) {
+        byDate[l.date].pushups += (l.pushups_completed || 0);
+        byDate[l.date].squats += (l.squats_completed || 0);
+        byDate[l.date].steps += (l.steps_logged || 0);
       }
-      const max = Math.max(...days.map(d => byDate[d] || 0), 10);
-      return days.map((d, index) => {
-          const x = (index / 6) * 100;
-          const y = 40 - (((byDate[d] || 0) / max) * 40);
-          return `${x},${y}`;
-      }).join(' ');
+    });
+
+    return days.map(d => byDate[d]);
   };
 
-  const pushupPoints = generateChartPoints(logs, 'pushups_completed');
-  const squatPoints = generateChartPoints(logs, 'squats_completed');
+  const chartData = generateChartData();
 
   const totalPushups = logs.reduce((acc, log) => acc + (log.pushups_completed || 0), 0);
   const totalSquats = logs.reduce((acc, log) => acc + (log.squats_completed || 0), 0);
@@ -134,6 +164,44 @@ export default function Analytics() {
                 </div>
             </section>
 
+            <section className="grid grid-cols-2 gap-4">
+                <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col items-center text-center">
+                    <h4 className="font-extrabold text-on-surface-variant text-xs uppercase tracking-wider mb-4">Daily Averages</h4>
+                    <div className="space-y-3 w-full">
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Pushups</span>
+                            <span className="text-lg font-black text-[#00675d]">{avgPushups}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Squats</span>
+                            <span className="text-lg font-black text-secondary">{avgSquats}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Steps</span>
+                            <span className="text-lg font-black text-[#a03a0f]">{avgSteps}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col items-center text-center">
+                    <h4 className="font-extrabold text-on-surface-variant text-xs uppercase tracking-wider mb-4">Personal Bests</h4>
+                    <div className="space-y-3 w-full">
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Pushups</span>
+                            <span className="text-lg font-black text-[#00675d]">{maxPushups}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Squats</span>
+                            <span className="text-lg font-black text-secondary">{maxSquats}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-surface-container-low px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase">Steps</span>
+                            <span className="text-lg font-black text-[#a03a0f]">{maxSteps}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section className="space-y-4 pt-4">
                 <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-[#00675d]">calendar_month</span>
@@ -158,9 +226,17 @@ export default function Analytics() {
                             <div className="text-3xl font-black mt-1 text-on-surface">{totalPushups} <span className="text-sm font-bold text-on-surface-variant tracking-normal">historical total</span></div>
                         </div>
                     </div>
-                    <svg viewBox="0 -8 100 50" className="w-full h-16 mt-4 stroke-[#00675d] fill-none overflow-visible">
-                        <polyline points={pushupPoints} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <div className="h-48 w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                <Line type="monotone" dataKey="pushups" stroke="#00675d" strokeWidth={4} dot={{ r: 4, fill: '#00675d', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
 
                 <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 space-y-4">
@@ -170,9 +246,37 @@ export default function Analytics() {
                             <div className="text-3xl font-black mt-1 text-on-surface">{totalSquats} <span className="text-sm font-bold text-on-surface-variant tracking-normal">historical total</span></div>
                         </div>
                     </div>
-                    <svg viewBox="0 -8 100 50" className="w-full h-16 mt-4 stroke-secondary fill-none overflow-visible">
-                        <polyline points={squatPoints} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <div className="h-48 w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                <Line type="monotone" dataKey="squats" stroke="#0f172a" strokeWidth={4} dot={{ r: 4, fill: '#0f172a', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 space-y-4">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h4 className="font-extrabold text-on-surface-variant text-sm uppercase tracking-wider">7-Day Walking</h4>
+                            <div className="text-3xl font-black mt-1 text-on-surface"><span className="text-sm font-bold text-on-surface-variant tracking-normal">Steps over time</span></div>
+                        </div>
+                    </div>
+                    <div className="h-48 w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                <Line type="monotone" dataKey="steps" stroke="#a03a0f" strokeWidth={4} dot={{ r: 4, fill: '#a03a0f', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
             </section>
         </main>

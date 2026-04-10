@@ -57,8 +57,8 @@ export default function Today() {
       date: todayDateString,
       timestamp: Date.now(),
       hour_slot: currentHour,
-      pushups_completed: pushups,
-      squats_completed: squats,
+      pushups_completed: (existingLog?.pushups_completed || 0) + pushups,
+      squats_completed: (existingLog?.squats_completed || 0) + squats,
       steps_logged: existingLog?.steps_logged || 0,
       water_oz: existingLog?.water_oz || 0,
     });
@@ -97,7 +97,7 @@ export default function Today() {
   };
 
   const totalWater = logs?.reduce((acc, log) => acc + (log.water_oz || 0), 0) || 0;
-  const totalSteps = logs?.reduce((acc, log) => Math.max(acc, log.steps_logged || 0), 0) || 0; // Steps are usually cumulative for the day in this basic schema
+  const totalSteps = logs?.reduce((acc, log) => acc + (log.steps_logged || 0), 0) || 0;
 
   if (!isActiveWindow) {
     return (
