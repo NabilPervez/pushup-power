@@ -26,14 +26,6 @@ export default function BottomNav() {
         <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Analytics</span>
       </Link>
 
-      <Link 
-        to="/settings" 
-        className={`flex flex-col items-center justify-center transition-opacity active:scale-90 duration-200 ease-out group ${isActive('/settings') ? 'text-[#14B8A6] dark:text-[#2dd4bf] bg-[#14B8A6]/10 rounded-full px-5 py-2' : 'text-slate-400 dark:text-slate-500 hover:text-[#14B8A6]'}`}
-      >
-        <span className="material-symbols-outlined mb-1" style={isActive('/settings') ? { fontVariationSettings: "'FILL' 1" } : {}}>settings</span>
-        <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Settings</span>
-      </Link>
-
     </nav>
   );
 }

@@ -1,34 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 
 export default function Analytics() {
-  const [stepsInput, setStepsInput] = useState('');
-  
   const logs = useLiveQuery(() => db.workout_logs.toArray());
 
   if (!logs) return null;
 
   const todayDateString = new Date().toISOString().split('T')[0];
   
-  const handleSaveSteps = async () => {
-    if (!stepsInput) return;
-    const currentHour = new Date().getHours();
-    const id = `${todayDateString}-${currentHour}`;
-    
-    const existing = await db.workout_logs.get(id);
-    await db.workout_logs.put({
-      id: id,
-      date: todayDateString,
-      timestamp: Date.now(),
-      hour_slot: currentHour,
-      pushups_completed: existing?.pushups_completed || 0,
-      squats_completed: existing?.squats_completed || 0,
-      steps_logged: parseInt(stepsInput, 10),
-      water_oz: existing?.water_oz || 0,
-    });
-    setStepsInput('');
-  };
+  const todayLogs = logs.filter(l => l.date === todayDateString);
+  const todayPushups = todayLogs.reduce((acc, log) => acc + (log.pushups_completed || 0), 0);
+  const todaySquats = todayLogs.reduce((acc, log) => acc + (log.squats_completed || 0), 0);
+  const todaySteps = todayLogs.reduce((acc, log) => Math.max(acc, log.steps_logged || 0), 0);
+  const todayWater = todayLogs.reduce((acc, log) => acc + (log.water_oz || 0), 0);
+
 
   const getHeatmapData = () => {
     const data = {};
@@ -42,25 +29,50 @@ export default function Analytics() {
   const heatmapData = getHeatmapData();
   const maxIntensity = Math.max(...Object.values(heatmapData), 1);
   
-  // Create 98 cells for heatmap (14 cols x 7 rows)
-  const cells = Array.from({ length: 98 }).map((_, i) => {
-    // Just mock dates for visual purpose backwards from today
-    const d = new Date();
-    d.setDate(d.getDate() - (97 - i));
-    const ds = d.toISOString().split('T')[0];
-    const val = heatmapData[ds] || 0;
-    
-    let intensityClass = 'bg-surface-container-highest';
-    if (val > 0) {
-      const ratio = val / maxIntensity;
-      if (ratio > 0.75) intensityClass = 'bg-[#00675d]';
-      else if (ratio > 0.5) intensityClass = 'bg-[#00675d]/80';
-      else if (ratio > 0.25) intensityClass = 'bg-[#00675d]/50';
-      else intensityClass = 'bg-[#00675d]/20';
-    }
-    
-    return <div key={i} className={`w-full aspect-square rounded-[4px] ${intensityClass}`}></div>;
-  });
+  // Generate calendar cells
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const monthName = now.toLocaleString('default', { month: 'long' });
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) {
+    cells.push(<div key={`empty-${i}`} className="w-full aspect-square opacity-0"></div>);
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    const val = heatmapData[dateString] || 0;
+    let bgClass = "bg-surface-container-highest text-on-surface-variant font-medium";
+    if (val > 0) bgClass = "bg-[#00675d] text-white font-bold shadow-md shadow-[#00675d]/20";
+    cells.push(
+      <div key={i} className={`w-full aspect-square rounded-[8px] flex items-center justify-center text-xs ${bgClass}`}>
+        {i}
+      </div>
+    );
+  }
+
+  const generateChartPoints = (logs, type) => {
+      const byDate = {};
+      logs.forEach(l => {
+          byDate[l.date] = (byDate[l.date] || 0) + (l[type] || 0);
+      });
+      const days = [];
+      for(let i=6; i>=0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          days.push(d.toISOString().split('T')[0]);
+      }
+      const max = Math.max(...days.map(d => byDate[d] || 0), 10);
+      return days.map((d, index) => {
+          const x = (index / 6) * 100;
+          const y = 40 - (((byDate[d] || 0) / max) * 40);
+          return `${x},${y}`;
+      }).join(' ');
+  };
+
+  const pushupPoints = generateChartPoints(logs, 'pushups_completed');
+  const squatPoints = generateChartPoints(logs, 'squats_completed');
 
   const totalPushups = logs.reduce((acc, log) => acc + (log.pushups_completed || 0), 0);
   const totalSquats = logs.reduce((acc, log) => acc + (log.squats_completed || 0), 0);
@@ -73,9 +85,9 @@ export default function Analytics() {
                     <span className="material-symbols-outlined text-[#14B8A6]">calendar_today</span>
                     <h1 className="text-xl font-extrabold text-[#14B8A6] tracking-tight">Pushup Power</h1>
                 </div>
-                <div className="flex items-center gap-4">
-                    <span className="material-symbols-outlined text-slate-500">notifications</span>
-                </div>
+                <Link to="/settings" className="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                    <span className="material-symbols-outlined text-slate-500">settings</span>
+                </Link>
             </div>
         </header>
 
@@ -87,86 +99,80 @@ export default function Analytics() {
                 </div>
             </section>
 
-            <section className="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_20px_40px_rgba(0,0,0,0.04)] relative overflow-hidden group">
-                <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#00675d]/5 rounded-full blur-3xl group-hover:bg-[#00675d]/10 transition-colors"></div>
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-full bg-[#ffc4b1] flex items-center justify-center">
-                            <span className="material-symbols-outlined text-[#832800]">directions_run</span>
-                        </div>
-                        <h3 className="font-bold text-lg">Steps Today</h3>
+            <section className="bg-[#00675d] text-white rounded-[2rem] p-8 shadow-[0px_20px_40px_rgba(0,103,93,0.15)] relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="relative z-10 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-lg opacity-90">Today's Grand Total</h3>
+                        <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-4 items-center">
-                        <div className="relative w-full">
-                            <input 
-                                type="number" 
-                                value={stepsInput}
-                                onChange={e => setStepsInput(e.target.value)}
-                                className="w-full bg-surface-container-low border-none rounded-full px-8 py-4 text-2xl font-bold focus:ring-2 focus:ring-[#6af2de] focus:bg-surface-container-lowest transition-all placeholder:text-surface-container-highest" 
-                                placeholder="0" 
-                            />
-                            <span className="absolute right-8 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant uppercase text-xs tracking-widest">Steps</span>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-black/10 rounded-2xl p-4 backdrop-blur-sm">
+                            <span className="block text-3xl font-black">{todayPushups}</span>
+                            <span className="block text-xs font-bold uppercase tracking-widest opacity-80 mt-1">Pushups</span>
                         </div>
-                        <button onClick={handleSaveSteps} className="w-full md:w-auto kinetic-pulse-gradient text-white px-10 py-4 rounded-full font-bold shadow-lg active:scale-95 transition-transform">
-                            Save
-                        </button>
+                        <div className="bg-black/10 rounded-2xl p-4 backdrop-blur-sm">
+                            <span className="block text-3xl font-black">{todaySquats}</span>
+                            <span className="block text-xs font-bold uppercase tracking-widest opacity-80 mt-1">Squats</span>
+                        </div>
+                        <div className="bg-black/10 rounded-2xl p-4 backdrop-blur-sm flex items-center gap-3">
+                            <span className="material-symbols-outlined text-red-300">footprint</span>
+                            <div>
+                                <span className="block text-xl font-black tracking-tight">{todaySteps}</span>
+                                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">Steps</span>
+                            </div>
+                        </div>
+                        <div className="bg-black/10 rounded-2xl p-4 backdrop-blur-sm flex items-center gap-3">
+                            <span className="material-symbols-outlined text-blue-300">water_drop</span>
+                            <div>
+                                <span className="block text-xl font-black tracking-tight">{todayWater}<span className="text-xs ml-0.5">oz</span></span>
+                                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">Water</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section className="space-y-4">
+            <section className="space-y-4 pt-4">
                 <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[#00675d]">grid_view</span>
-                    <h3 className="font-bold text-xl tracking-tight text-on-surface">Activity Heatmap</h3>
+                    <span className="material-symbols-outlined text-[#00675d]">calendar_month</span>
+                    <h3 className="font-bold text-xl tracking-tight text-on-surface">Activity Calendar</h3>
+                    <span className="text-sm font-bold text-on-surface-variant ml-auto bg-surface-container-highest px-3 py-1 rounded-full">{monthName} {year}</span>
                 </div>
                 <div className="bg-surface-container-low rounded-xl p-6">
-                    <div className="heatmap-grid mb-4">
+                    <div className="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                    </div>
+                    <div className="grid grid-cols-7 gap-2">
                         {cells}
                     </div>
-                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">
-                        <span>Less Activity</span>
-                        <div className="flex gap-1">
-                            <div className="w-3 h-3 rounded-[2px] bg-surface-container-highest"></div>
-                            <div className="w-3 h-3 rounded-[2px] bg-[#00675d]/30"></div>
-                            <div className="w-3 h-3 rounded-[2px] bg-[#00675d]/60"></div>
-                            <div className="w-3 h-3 rounded-[2px] bg-[#00675d]"></div>
-                        </div>
-                        <span>Pushup Power</span>
-                    </div>
                 </div>
             </section>
 
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_20px_40px_rgba(0,0,0,0.04)] space-y-4">
+            <section className="grid grid-cols-1 gap-6 pb-8">
+                <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 space-y-4">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h4 className="font-bold text-on-surface-variant text-sm uppercase tracking-wide">Pushups Trend</h4>
-                            <div className="text-3xl font-extrabold mt-1">{totalPushups} <span className="text-sm font-medium text-on-surface-variant">total</span></div>
+                            <h4 className="font-extrabold text-on-surface-variant text-sm uppercase tracking-wider">7-Day Pushups</h4>
+                            <div className="text-3xl font-black mt-1 text-on-surface">{totalPushups} <span className="text-sm font-bold text-on-surface-variant tracking-normal">historical total</span></div>
                         </div>
-                        <span className="material-symbols-outlined text-[#00675d] bg-[#00675d]/10 p-2 rounded-full">auto_graph</span>
                     </div>
+                    <svg viewBox="0 -8 100 50" className="w-full h-16 mt-4 stroke-[#00675d] fill-none overflow-visible">
+                        <polyline points={pushupPoints} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </div>
 
-                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_20px_40px_rgba(0,0,0,0.04)] space-y-4">
+                <div className="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0px_20px_40px_rgba(0,0,0,0.04)] ring-1 ring-black/5 space-y-4">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h4 className="font-bold text-on-surface-variant text-sm uppercase tracking-wide">Squats Trend</h4>
-                            <div className="text-3xl font-extrabold mt-1">{totalSquats} <span className="text-sm font-medium text-on-surface-variant">total</span></div>
+                            <h4 className="font-extrabold text-on-surface-variant text-sm uppercase tracking-wider">7-Day Squats</h4>
+                            <div className="text-3xl font-black mt-1 text-on-surface">{totalSquats} <span className="text-sm font-bold text-on-surface-variant tracking-normal">historical total</span></div>
                         </div>
-                        <span className="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-full">stacked_line_chart</span>
                     </div>
-                </div>
-            </section>
-
-            <section className="bg-[#2c2f30] text-[#f5f6f7] rounded-xl p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <span className="material-symbols-outlined text-8xl">insights</span>
-                </div>
-                <div className="relative z-10 space-y-4">
-                    <h3 className="text-2xl font-bold tracking-tight">Weekly Focus</h3>
-                    <p className="text-[#d1d5d7] font-medium leading-relaxed max-w-sm">
-                        You're doing great! Keep building that habit, one hour at a time.
-                    </p>
+                    <svg viewBox="0 -8 100 50" className="w-full h-16 mt-4 stroke-secondary fill-none overflow-visible">
+                        <polyline points={squatPoints} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </div>
             </section>
         </main>

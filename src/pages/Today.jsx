@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 
 export default function Today() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showWaterModal, setShowWaterModal] = useState(false);
+  const [showStepsModal, setShowStepsModal] = useState(false);
   const [customWater, setCustomWater] = useState('');
+  const [stepsInput, setStepsInput] = useState('');
   const [toastMessage, setToastMessage] = useState('');
   const [pushups, setPushups] = useState(0);
   const [squats, setSquats] = useState(0);
@@ -75,6 +78,22 @@ export default function Today() {
       water_oz: (existingLog?.water_oz || 0) + amount,
     });
     setShowWaterModal(false);
+  };
+
+  const handleSaveSteps = async () => {
+    if (!stepsInput) return;
+    await db.workout_logs.put({
+      id: `${todayDateString}-${currentHour}`,
+      date: todayDateString,
+      timestamp: Date.now(),
+      hour_slot: currentHour,
+      pushups_completed: existingLog?.pushups_completed || 0,
+      squats_completed: existingLog?.squats_completed || 0,
+      steps_logged: (existingLog?.steps_logged || 0) + parseInt(stepsInput, 10),
+      water_oz: existingLog?.water_oz || 0,
+    });
+    setStepsInput('');
+    setShowStepsModal(false);
   };
 
   const totalWater = logs?.reduce((acc, log) => acc + (log.water_oz || 0), 0) || 0;
@@ -150,9 +169,9 @@ export default function Today() {
                     <span className="material-symbols-outlined text-[#14B8A6]">calendar_today</span>
                     <h1 className="text-xl font-extrabold text-[#14B8A6] tracking-tight">Pushup Power</h1>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden flex items-center justify-center">
-                    <span className="material-symbols-outlined text-slate-500">person</span>
-                </div>
+                <Link to="/settings" className="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                    <span className="material-symbols-outlined text-slate-500">settings</span>
+                </Link>
             </div>
         </header>
 
@@ -177,7 +196,10 @@ export default function Today() {
                 </div>
             </section>
 
-            <section className="grid grid-cols-2 gap-4">
+            <div className="text-center mt-6">
+                <p className="text-sm font-bold text-on-surface-variant uppercase tracking-widest">This is your set goal this hour</p>
+            </div>
+            <section className={`grid gap-4 ${settings.exercises_enabled.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {settings.exercises_enabled.includes('pushups') && (
                     <div className="bg-[#ffc4b1] rounded-xl p-6 flex flex-col items-center justify-center gap-2 aspect-[4/5] shadow-sm">
                         <div className="w-12 h-12 rounded-full bg-[#832800]/20 flex items-center justify-center">
@@ -261,13 +283,13 @@ export default function Today() {
                             <p className="text-[10px] uppercase font-bold text-on-surface-variant">Hydration</p>
                         </div>
                     </button>
-                    <div className="bg-surface-container-low rounded-lg p-4 flex items-center gap-3">
+                    <button onClick={() => setShowStepsModal(true)} className="bg-surface-container-low rounded-lg p-4 flex items-center gap-3 text-left active:scale-95 transition-transform">
                         <span className="material-symbols-outlined text-[#a03a0f]">footprint</span>
                         <div>
                             <p className="text-xl font-bold">{totalSteps}</p>
                             <p className="text-[10px] uppercase font-bold text-on-surface-variant">Steps</p>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </section>
         </main>
@@ -321,6 +343,44 @@ export default function Today() {
                         onClick={() => { if(customWater) handleLogWater(parseInt(customWater, 10)) }}
                         className="w-full h-16 bg-[#00675d] text-white font-black text-lg rounded-full shadow-lg shadow-[#00675d]/20 active:scale-[0.98] transition-all">
                         Log Water
+                    </button>
+                </div>
+            </div>
+        )}
+
+        {showStepsModal && (
+            <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4 sm:p-6">
+                <div className="absolute inset-0 bg-on-background/40 backdrop-blur-sm transition-opacity" onClick={() => setShowStepsModal(false)}></div>
+                <div className="relative w-full max-w-sm bg-surface-container-lowest rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300">
+                    <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full mx-auto mb-6 sm:hidden"></div>
+                    <button className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:bg-[#6af2de] hover:text-[#00594f] transition-colors" onClick={() => setShowStepsModal(false)}>
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
+                    
+                    <div className="text-center space-y-2 mb-8">
+                        <div className="w-16 h-16 bg-[#a03a0f]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span className="material-symbols-outlined text-[#a03a0f] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>footprint</span>
+                        </div>
+                        <h3 className="text-2xl font-extrabold tracking-tight">Log Steps</h3>
+                        <p className="text-on-surface-variant font-medium text-sm">Every step counts.</p>
+                    </div>
+
+                    <div className="mb-8">
+                        <div className="relative">
+                            <input 
+                                type="number" 
+                                value={stepsInput} 
+                                onChange={(e) => setStepsInput(e.target.value)}
+                                className="w-full h-14 px-6 rounded-2xl bg-surface-container-low border-none focus:ring-2 focus:ring-[#00675d] font-bold text-lg placeholder:text-on-surface-variant/30" 
+                                placeholder="Enter steps" />
+                            <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-on-surface-variant/50">steps</span>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={handleSaveSteps}
+                        className="w-full h-16 bg-[#a03a0f] text-white font-black text-lg rounded-full shadow-lg shadow-[#a03a0f]/20 active:scale-[0.98] transition-all">
+                        Log Steps
                     </button>
                 </div>
             </div>
