@@ -20,6 +20,22 @@ export default function Today() {
     return () => clearInterval(timer);
   }, []);
 
+  // Compute Targets safely for hooks
+  const daysSinceBaseline = baselines ? Math.floor((currentDate.getTime() - baselines.timestamp) / (1000 * 60 * 60 * 24)) : 0;
+  const weeksSinceBaseline = Math.floor(daysSinceBaseline / 7);
+  const multiplier = Math.pow(1.10, weeksSinceBaseline);
+  
+  const pushupsTarget = baselines ? Math.floor((baselines.pushups_max * 0.30) * multiplier) : 0;
+  const squatsTarget = baselines ? Math.floor((baselines.squats_max * 0.30) * multiplier) : 0;
+
+  // Reset inputs when target changes
+  useEffect(() => {
+    if (baselines) {
+      setPushups(pushupsTarget);
+      setSquats(squatsTarget);
+    }
+  }, [pushupsTarget, squatsTarget, baselines]);
+
   if (!settings || !baselines) return null;
 
   const currentHour = currentDate.getHours();
@@ -29,22 +45,6 @@ export default function Today() {
   const isActiveWindow = currentHour >= startHour && currentHour < endHour;
   const totalActiveHours = endHour - startHour;
   const hoursPassed = Math.max(0, currentHour - startHour + 1);
-
-  // Compute Targets
-  const daysSinceBaseline = Math.floor((currentDate.getTime() - baselines.timestamp) / (1000 * 60 * 60 * 24));
-  const weeksSinceBaseline = Math.floor(daysSinceBaseline / 7);
-  const multiplier = Math.pow(1.10, weeksSinceBaseline);
-  
-  const pushupsTarget = Math.floor((baselines.pushups_max * 0.30) * multiplier);
-  const squatsTarget = Math.floor((baselines.squats_max * 0.30) * multiplier);
-
-
-
-  // Reset inputs when target changes
-  useEffect(() => {
-    setPushups(pushupsTarget);
-    setSquats(squatsTarget);
-  }, [pushupsTarget, squatsTarget]);
 
   const existingLog = logs?.find(l => l.hour_slot === currentHour);
 
