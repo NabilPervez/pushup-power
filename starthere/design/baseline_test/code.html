@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Set Your Baseline - Pushup Power</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#fb5151",
+                    "on-background": "#2c2f30",
+                    "on-tertiary-fixed-variant": "#665500",
+                    "tertiary": "#6c5a00",
+                    "background": "#f5f6f7",
+                    "secondary-dim": "#902e02",
+                    "primary-container": "#6af2de",
+                    "on-tertiary-container": "#5b4b00",
+                    "on-surface-variant": "#595c5d",
+                    "on-tertiary-fixed": "#453900",
+                    "on-primary": "#c0fff3",
+                    "on-primary-container": "#00594f",
+                    "on-primary-fixed": "#00443c",
+                    "surface-container-low": "#eff1f2",
+                    "surface-tint": "#00675d",
+                    "inverse-surface": "#0c0f10",
+                    "on-secondary-container": "#832800",
+                    "secondary-fixed-dim": "#ffb196",
+                    "surface-bright": "#f5f6f7",
+                    "primary-fixed": "#6af2de",
+                    "tertiary-fixed-dim": "#efc900",
+                    "error-dim": "#9f0519",
+                    "on-tertiary": "#fff2cd",
+                    "surface-dim": "#d1d5d7",
+                    "on-primary-fixed-variant": "#006359",
+                    "surface": "#f5f6f7",
+                    "error": "#b31b25",
+                    "secondary-fixed": "#ffc4b1",
+                    "tertiary-dim": "#5e4e00",
+                    "outline-variant": "#abadae",
+                    "on-secondary-fixed-variant": "#922f03",
+                    "on-error": "#ffefee",
+                    "surface-container-high": "#e0e3e4",
+                    "inverse-primary": "#6df5e1",
+                    "surface-container-highest": "#dadddf",
+                    "on-secondary": "#ffefeb",
+                    "primary": "#00675d",
+                    "tertiary-fixed": "#ffd709",
+                    "tertiary-container": "#ffd709",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ffc4b1",
+                    "outline": "#757778",
+                    "surface-container": "#e6e8ea",
+                    "inverse-on-surface": "#9b9d9e",
+                    "primary-dim": "#005a50",
+                    "surface-variant": "#dadddf",
+                    "on-error-container": "#570008",
+                    "primary-fixed-dim": "#5ae4d0",
+                    "on-secondary-fixed": "#621c00",
+                    "on-surface": "#2c2f30",
+                    "secondary": "#a03a0f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-kinetic-gradient {
+            background: linear-gradient(135deg, #00675d 0%, #6af2de 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="bg-[#f5f6f7] dark:bg-slate-900 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#14B8A6] dark:text-[#2dd4bf]" data-icon="calendar_today">calendar_today</span>
+<h1 class="text-xl font-extrabold text-[#14B8A6] dark:text-[#2dd4bf] font-['Plus_Jakarta_Sans'] tracking-tight">Pushup Power</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col px-6 pt-8 pb-32 max-w-lg mx-auto w-full">
+<!-- Hero Header -->
+<section class="mb-10 text-center md:text-left">
+<h2 class="text-5xl font-extrabold tracking-tight text-on-background mb-4 leading-tight">
+                Set Your <span class="text-primary italic">Baseline</span>
+</h2>
+<p class="text-on-surface-variant text-lg font-medium leading-relaxed max-w-xs md:max-w-none">
+                Do one set of pushups and squats to comfortable failure right now.
+            </p>
+</section>
+<!-- Kinetic Input Bento Grid -->
+<div class="space-y-6">
+<!-- Pushups Card -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_20px_40px_rgba(44,47,48,0.06)] relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
+<span class="material-symbols-outlined text-[120px]" data-icon="fitness_center">fitness_center</span>
+</div>
+<div class="flex justify-between items-end relative z-10">
+<div class="flex flex-col">
+<span class="text-primary font-bold tracking-widest uppercase text-xs mb-1">Max Exercise</span>
+<h3 class="text-2xl font-bold text-on-surface">Max Pushups</h3>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-full p-2 gap-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-lowest text-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-bold" data-icon="remove">remove</span>
+</button>
+<span class="text-6xl font-extrabold tracking-tighter text-on-surface w-20 text-center">24</span>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-bold" data-icon="add">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Squats Card -->
+<div class="bg-surface-container-low rounded-xl p-8 relative group">
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="text-secondary font-bold tracking-widest uppercase text-xs mb-1">Lower Body</span>
+<h3 class="text-2xl font-bold text-on-surface">Max Squats</h3>
+</div>
+<div class="flex items-center bg-surface-container-highest rounded-full p-2 gap-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-bold" data-icon="remove">remove</span>
+</button>
+<span class="text-6xl font-extrabold tracking-tighter text-on-surface w-20 text-center">32</span>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-on-surface text-surface shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined font-bold" data-icon="add">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Tip Section -->
+<div class="mt-10 p-6 bg-tertiary-container/20 rounded-xl flex gap-4 items-start border border-tertiary-container/10">
+<span class="material-symbols-outlined text-tertiary" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<p class="text-on-tertiary-container text-sm font-semibold leading-snug">
+                Pro Tip: Don't push to absolute pain. Stop when you can't maintain perfect form anymore!
+            </p>
+</div>
+<!-- Decorative Image -->
+<div class="mt-12 rounded-xl overflow-hidden aspect-video relative group">
+<img alt="Workout Motivation" class="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" data-alt="dynamic close-up of a person performing a pushup in a minimalist gym setting with sharp cinematic lighting and teal color accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRXxKXfTmpXM62UHcMoqgwPsbZnO_4782K_bopgZojAHD559rD0kHLxx_e5Mj6absvqKbXxHBGDLbqjSBp9TjwdN9KWiwxoTfRF9iwEONLaYYZhTxRPKZQO4lNbeiADfSA6BBCvd0tbMMzE1PSaU4GbQkchgOUKWoPdhHQ2A2jtCyboLPu-caayp3Q6NjAUDqr0B6OJUiUEFf5DpDYfeOmPJbZVp7R9VV6DmAu5IrvidAyjZQYQbnwvNPJuqyM3_pWcYCWb2xL6ns"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<p class="text-white font-bold italic text-lg">Push your limits, find your power.</p>
+</div>
+</div>
+<!-- FAB Container (Suppressed per rules on transactional screen, but Action Button for flow is needed) -->
+<div class="mt-auto pt-10">
+<button class="w-full h-16 bg-kinetic-gradient text-on-primary rounded-full font-extrabold text-xl tracking-tight shadow-[0px_20px_40px_rgba(0,103,93,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3">
+                Save Baseline
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<!-- Determined as active: "Today" as this is the setup/start journey -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-8 pt-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0px_-10px_30px_rgba(0,0,0,0.04)] rounded-t-[3rem]">
+<a class="flex flex-col items-center justify-center text-[#14B8A6] dark:text-[#2dd4bf] bg-[#14B8A6]/10 rounded-full px-5 py-2 transition-all duration-200 ease-out active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="target" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Today</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#14B8A6] dark:hover:text-[#2dd4bf] transition-all duration-200 ease-out active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#14B8A6] dark:hover:text-[#2dd4bf] transition-all duration-200 ease-out active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Settings</span>
+</a>
+</nav>
+</body></html>

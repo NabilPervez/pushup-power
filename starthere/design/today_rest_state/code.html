@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#fb5151",
+                    "on-background": "#2c2f30",
+                    "on-tertiary-fixed-variant": "#665500",
+                    "tertiary": "#6c5a00",
+                    "background": "#f5f6f7",
+                    "secondary-dim": "#902e02",
+                    "primary-container": "#6af2de",
+                    "on-tertiary-container": "#5b4b00",
+                    "on-surface-variant": "#595c5d",
+                    "on-tertiary-fixed": "#453900",
+                    "on-primary": "#c0fff3",
+                    "on-primary-container": "#00594f",
+                    "on-primary-fixed": "#00443c",
+                    "surface-container-low": "#eff1f2",
+                    "surface-tint": "#00675d",
+                    "inverse-surface": "#0c0f10",
+                    "on-secondary-container": "#832800",
+                    "secondary-fixed-dim": "#ffb196",
+                    "surface-bright": "#f5f6f7",
+                    "primary-fixed": "#6af2de",
+                    "tertiary-fixed-dim": "#efc900",
+                    "error-dim": "#9f0519",
+                    "on-tertiary": "#fff2cd",
+                    "surface-dim": "#d1d5d7",
+                    "on-primary-fixed-variant": "#006359",
+                    "surface": "#f5f6f7",
+                    "error": "#b31b25",
+                    "secondary-fixed": "#ffc4b1",
+                    "tertiary-dim": "#5e4e00",
+                    "outline-variant": "#abadae",
+                    "on-secondary-fixed-variant": "#922f03",
+                    "on-error": "#ffefee",
+                    "surface-container-high": "#e0e3e4",
+                    "inverse-primary": "#6df5e1",
+                    "surface-container-highest": "#dadddf",
+                    "on-secondary": "#ffefeb",
+                    "primary": "#00675d",
+                    "tertiary-fixed": "#ffd709",
+                    "tertiary-container": "#ffd709",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ffc4b1",
+                    "outline": "#757778",
+                    "surface-container": "#e6e8ea",
+                    "inverse-on-surface": "#9b9d9e",
+                    "primary-dim": "#005a50",
+                    "surface-variant": "#dadddf",
+                    "on-error-container": "#570008",
+                    "primary-fixed-dim": "#5ae4d0",
+                    "on-secondary-fixed": "#621c00",
+                    "on-surface": "#2c2f30",
+                    "secondary": "#a03a0f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-[#f5f6f7] dark:bg-slate-900 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#14B8A6] dark:text-[#2dd4bf]" data-icon="calendar_today">calendar_today</span>
+<h1 class="text-xl font-extrabold text-[#14B8A6] dark:text-[#2dd4bf] tracking-tight">Pushup Power</h1>
+</div>
+<div class="bg-[#eff1f2] dark:bg-slate-800 rounded-full px-4 py-1.5">
+<span class="text-on-surface-variant font-semibold text-sm">Oct 24, 2023</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-8 pt-24 pb-32">
+<!-- Kinetic Pulse - Central Rest Illustration Section -->
+<div class="relative w-full max-w-md flex flex-col items-center text-center">
+<!-- Asymmetric Glow Effect -->
+<div class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-container/30 blur-[80px] rounded-full"></div>
+<!-- Central Icon Component (Pill Geometry) -->
+<div class="bg-surface-container-lowest shadow-[0px_20px_40px_rgba(44,47,48,0.06)] rounded-xl p-12 mb-10 border border-white/50 backdrop-blur-sm">
+<div class="relative">
+<span class="material-symbols-outlined text-[120px] text-primary/80" data-icon="dark_mode" style="font-variation-settings: 'FILL' 1;">dark_mode</span>
+<!-- Small Sparkle Detail -->
+<span class="material-symbols-outlined absolute -top-4 -right-4 text-tertiary-fixed-dim text-4xl" data-icon="auto_awesome">auto_awesome</span>
+</div>
+</div>
+<!-- Editorial Typography Hierarchy -->
+<div class="space-y-4">
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface leading-tight">
+                    Rest up!
+                </h2>
+<p class="text-lg text-on-surface-variant leading-relaxed font-medium px-4">
+                    Your next session begins tomorrow at <span class="text-primary font-bold">08:00</span>.
+                </p>
+</div>
+<!-- Bento-Style Stats Grid (Rest Mode Context) -->
+<div class="grid grid-cols-2 gap-4 w-full mt-12">
+<!-- Recovery Card -->
+<div class="bg-surface-container-low rounded-lg p-6 flex flex-col items-start gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="battery_charging_80">battery_charging_80</span>
+<span class="text-xs uppercase tracking-widest font-bold text-outline">Recovery</span>
+<span class="text-2xl font-bold text-on-surface">84%</span>
+</div>
+<!-- Weekly Streak Card -->
+<div class="bg-surface-container-low rounded-lg p-6 flex flex-col items-start gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="text-xs uppercase tracking-widest font-bold text-outline">Streak</span>
+<span class="text-2xl font-bold text-on-surface">12 Days</span>
+</div>
+</div>
+<!-- Action Insight Card (No-Line Principle) -->
+<div class="mt-4 w-full bg-surface-container-lowest border border-white/40 shadow-sm rounded-lg p-6 text-left flex items-center gap-5">
+<div class="bg-primary-container/20 p-3 rounded-full">
+<span class="material-symbols-outlined text-primary" data-icon="insights">insights</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Did you know?</p>
+<p class="text-xs text-on-surface-variant">Muscle growth happens while you sleep, not while you train.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-8 pb-8 pt-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-[0px_-10px_30px_rgba(0,0,0,0.04)] rounded-t-[3rem]">
+<!-- Today (Active) -->
+<a class="flex flex-col items-center justify-center text-[#14B8A6] dark:text-[#2dd4bf] bg-[#14B8A6]/10 rounded-full px-5 py-2 hover:opacity-80 transition-opacity active:scale-90 duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="target" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Today</span>
+</a>
+<!-- Analytics (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#14B8A6] dark:hover:text-[#2dd4bf] transition-opacity active:scale-90 duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Analytics</span>
+</a>
+<!-- Settings (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#14B8A6] dark:hover:text-[#2dd4bf] transition-opacity active:scale-90 duration-200 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-semibold tracking-wide uppercase mt-1">Settings</span>
+</a>
+</nav>
+</body></html>
